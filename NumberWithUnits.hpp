@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include <map>
 #include <unordered_map>
 
 namespace ariel
@@ -14,7 +13,7 @@ namespace ariel
         static std::unordered_map<std::string, std::unordered_map<std::string, double>> _myMap;
 
         //private functions:
-        static double convertUnits(const std::string &src, const std::string &dest, double quantity);
+        static double convertUnits(const std::string &origin, const std::string &converted, double quantity);
         static void updateUnits(const std::string &unit_a, const std::string &unit_b);
 
     public:

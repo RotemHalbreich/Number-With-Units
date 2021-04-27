@@ -12,9 +12,9 @@ namespace ariel
     //Contructor that throws exception
     NumberWithUnits::NumberWithUnits(double quantity, const string &unit)
     {
-        if (_myMap.find(unit) == _myMap.end())
+        if (!_myMap.contains(unit))
         {
-            throw invalid_argument("This unit type doesn't exists!");
+            throw invalid_argument{"This unit type doesn't exists!"};
         }
         this->_unit = unit;
         this->_quantity = quantity;
@@ -39,20 +39,12 @@ namespace ariel
     }
 
     void NumberWithUnits::updateUnits(const string &unit_a, const string &unit_b)
-    //unit_a=km
-    //unit_b=m
-    //[km][m]
-    //[m][cm]
-    //inner={unit=cm,count=100000]}
-
-    //inner={inner.first,inner.secound}
     {
-        for (auto &inner : _myMap[unit_a])                       // 1km=1000m
-        {                                                      //                                                                                map.second->
-            double temp = _myMap[unit_b][unit_a] * inner.second; // unit_a: <km, <m,1000>>      map[]-> inside map
-            _myMap[unit_b][inner.first] = temp;                  // unit_b: <m, <km,1/1000>>    map[][]-> inside innerue
-            _myMap[inner.first][unit_b] = 1.0 / temp;            // <m, <m, 1>>
-                                                               // <m, <
+        for (auto &inner : _myMap[unit_a])                       
+        {
+            double temp = _myMap[unit_b][unit_a] * inner.second;
+            _myMap[unit_b][inner.first] = temp;
+            _myMap[inner.first][unit_b] = 1.0 / temp;
         }
     }
 
@@ -62,7 +54,7 @@ namespace ariel
         {
             return quantity;
         }
-        if (_myMap[origin].find(converted) == _myMap[origin].end())
+        if(!_myMap[origin].contains(converted))
         {
             throw invalid_argument{"Units do not match - [" + origin + "] cannot be converted to [" + converted + "]"};
         }
@@ -186,7 +178,7 @@ namespace ariel
             is >> rightBracket;
         } while (rightBracket != ']');
 
-        if (NumberWithUnits::_myMap.find(unit) == NumberWithUnits::_myMap.end())
+       if(!NumberWithUnits::_myMap.contains(unit))
         {
             throw invalid_argument{"This unit type doesn't exists!"};
         }
@@ -200,32 +192,3 @@ namespace ariel
         return os << num._quantity << "[" << num._unit << "]";
     }
 }
-
-// void NumberWithUnits::read_units(ifstream &file)
-// {
-//     string type_a, type_b, eq;
-//     double quantity_a = 0, quantity_b = 0;
-
-//     pair<string, double> unit_a = make_pair(type_a, quantity_a); // 1km = 1000m
-//     pair<string, double> unit_b = make_pair(type_b, quantity_b);
-
-//     while (file >> quantity_a >> type_a >> eq >> quantity_b >> type_b)
-//     {
-//         _Map[unit_a].second = quantity_a; //right
-//         _Map[unit_b].second = quantity_b; //left
-
-//         for (auto inner = _Map.begin(); inner != _Map.end(); ++inner)
-//         {
-//             double temp = _Map[unit_b].second * unit_b.second;
-//             _Map[unit_b].first = temp;
-//             _Map[unit_a].first = 1 / temp;
-//         }
-
-//         for (auto inner = _Map.begin(); inner != _Map.end(); ++inner)
-//         {
-//             double temp = _Map[unit_a].second * unit_a.second;
-//             _Map[unit_a].first = temp;
-//             _Map[unit_b].first = 1 / temp;
-//         }
-//     }
-// }
