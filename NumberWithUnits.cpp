@@ -40,7 +40,7 @@ namespace ariel
 
     void NumberWithUnits::updateUnits(const string &unit_a, const string &unit_b)
     {
-        for (auto &inner : _myMap[unit_a])                       
+        for (auto &inner : _myMap[unit_a])
         {
             double temp = _myMap[unit_b][unit_a] * inner.second;
             _myMap[unit_b][inner.first] = temp;
@@ -54,7 +54,7 @@ namespace ariel
         {
             return quantity;
         }
-        if(!_myMap[origin].contains(converted))
+        if (!_myMap[origin].contains(converted))
         {
             throw invalid_argument{"Units do not match - [" + origin + "] cannot be converted to [" + converted + "]"};
         }
@@ -164,26 +164,25 @@ namespace ariel
     //Input and Output operators:
     istream &operator>>(istream &is, NumberWithUnits &num)
     {
-        char leftBracket = '[', rightBracket = ']';
+        char ch = 0, leftBracket = '[', rightBracket = ']';
         double quantity = 0;
         string unit;
 
-        is >> quantity >> rightBracket;
+        is >> quantity >> ch;
         do
         {
-            if (leftBracket != rightBracket)
+            if (ch != leftBracket)
             {
-                unit.push_back(rightBracket);
+                unit.push_back(ch);
             }
-            is >> rightBracket;
-        } while (rightBracket != ']');
-
-       if(!NumberWithUnits::_myMap.contains(unit))
+            is >> ch;
+        } while (ch != rightBracket);
+        if (!NumberWithUnits::_myMap.contains(unit))
         {
             throw invalid_argument{"This unit type doesn't exists!"};
         }
-        num._quantity = quantity;
         num._unit = unit;
+        num._quantity = quantity;
         return is;
     }
 
