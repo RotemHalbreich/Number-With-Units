@@ -1,0 +1,17 @@
+1 km = 1000 m
+1 m = 100 cm
+
+1 ton = 1000 kg
+1 kg = 1000 gr
+
+1 day = 24 hour
+1 hour = 60 min
+1 min = 60 sec
+
+1 USD = 3.25 ILS
+1 GBP = 1.39 USD
+1 EUR = 0.85 GBP
+1 AED = 0.27 USD
+1 INR = 0.01 USD
+1 CNY = 0.16 USD
+1 TRY =  0.11 EUR

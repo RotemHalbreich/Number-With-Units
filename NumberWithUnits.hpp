@@ -12,24 +12,23 @@ namespace ariel
         std::string _unit;
         static std::unordered_map<std::string, std::unordered_map<std::string, double>> _myMap;
 
-        //private functions:
-        static double convertUnits(const std::string &origin, const std::string &converted, double quantity);
-        static void updateUnits(const std::string &unit_a, const std::string &unit_b);
-
     public:
         //Constructor:
         NumberWithUnits(double quantity, const std::string &unit);
 
-        //Public functions:
-        static void read_units(std::ifstream &file);
+        //Functions:
+        static void read_units(std::ifstream &units_file);
+        static double convertUnits(const std::string &origin, const std::string &converted, double quantity);
+        static void updateUnits(const std::string &unit_a, const std::string &unit_b);
+        static void printMap();
 
         //Addition and Subtraction operators:
-        NumberWithUnits operator+(const NumberWithUnits &num2);   //addition
+        NumberWithUnits operator+(const NumberWithUnits &num2) const;   //addition
         NumberWithUnits &operator+=(const NumberWithUnits &num2); //addition assignment
-        NumberWithUnits operator+();                              //unary plus
-        NumberWithUnits operator-(const NumberWithUnits &num2);   //subtraction
+        NumberWithUnits operator+() const;                              //unary plus
+        NumberWithUnits operator-(const NumberWithUnits &num2) const;   //subtraction
         NumberWithUnits &operator-=(const NumberWithUnits &num2); //subtraction assignment
-        NumberWithUnits operator-();                              //unary negation
+        NumberWithUnits operator-() const;                              //unary negation
 
         //Comparison operators:
         bool operator>(const NumberWithUnits &num2) const;  //greater than
@@ -47,7 +46,7 @@ namespace ariel
 
         //Multiplication operators:
         friend NumberWithUnits operator*(const double num1, const NumberWithUnits &num2); //multiplication
-        friend NumberWithUnits operator*(const NumberWithUnits &num1, const double num2); //multiplication
+        NumberWithUnits operator*(const double num2); //multiplication
 
         //Input and Output operators:
         friend std::istream &operator>>(std::istream &is, NumberWithUnits &num);       //input

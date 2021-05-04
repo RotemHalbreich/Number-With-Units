@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+// #include <iomanip>
 #include "NumberWithUnits.hpp"
 
 using namespace std;
@@ -12,7 +13,7 @@ namespace ariel
     //Contructor that throws exception
     NumberWithUnits::NumberWithUnits(double quantity, const string &unit)
     {
-        if (!_myMap.contains(unit)) // checks if the unit actually exists in the map
+        if (_myMap.count(unit) == 0) // checks if the unit actually exists in the map
         {
             throw invalid_argument{"This unit type doesn't exists!"};
         }
@@ -20,14 +21,14 @@ namespace ariel
         this->_quantity = quantity;
     }
 
-    void NumberWithUnits::read_units(ifstream &file)
+    void NumberWithUnits::read_units(ifstream &units_file)
     {
         string unit_a, unit_b;
         char eq = '=';
         double quantity_a = 0, quantity_b = 0;
         do
         {
-            file >> quantity_a >> unit_a >> eq >> quantity_b >> unit_b; // reads from file, example: file >> 1km = 100000cm
+            units_file >> quantity_a >> unit_a >> eq >> quantity_b >> unit_b; // reads from file, example: units_file >> 1km = 100000cm
 
             _myMap[unit_b][unit_a] = 1.0 / quantity_b; // [unit_b]: <cm, <km, 1/100,000>>  note: map[][]-> inner map's value
             _myMap[unit_a][unit_b] = quantity_b;       // [unit_a]: <km, <cm, 100,000>>    note: map[]-> inner map
@@ -35,16 +36,16 @@ namespace ariel
             updateUnits(unit_a, unit_b);
             updateUnits(unit_b, unit_a);
 
-        } while (!file.eof()); //Run until the end of file
+        } while (!units_file.eof()); //Run until the end of file
     }
 
     void NumberWithUnits::updateUnits(const string &unit_a, const string &unit_b)
-    {                                      // ~~~EXAMPLE~~~
-        for (auto &inner : _myMap[unit_a]) // finds all maps related to [km]: [unit_a]: <km, <cm, 100,000>>
+    {                                                            // ~~~EXAMPLE~~~
+        for (auto &inner : _myMap[unit_a])                       // finds all maps related to [km]: [unit_a]: <km, <cm, 100,000>>
         {
-            double temp = _myMap[unit_b][unit_a] * inner.second; // [unit_b]: <cm, <km, 1/100,000 * 100,000>> -> temp = 1
-            _myMap[unit_b][inner.first] = temp;                  // <cm, <cm, 1>>
-            _myMap[inner.first][unit_b] = 1.0 / temp;            //
+            double temp = _myMap[unit_b][unit_a] * inner.second; // Updates 2 units in both directions:
+            _myMap[unit_b][inner.first] = temp;                  // Example: [km]->[m] && [m]->[km]
+            _myMap[inner.first][unit_b] = 1.0 / temp;
         }
     }
 
@@ -54,15 +55,31 @@ namespace ariel
         {
             return quantity;
         }
-        if (!_myMap[origin].contains(converted)) //if the unit you want to convert to doesn't exists in the map
+        if (_myMap[origin].count(converted) == 0) //if the unit you want to convert to doesn't exists in the map
         {
             throw invalid_argument{"Units do not match - [" + origin + "] cannot be converted to [" + converted + "]"};
         }
         return _myMap[origin][converted] * quantity;
     }
 
+    void NumberWithUnits::printMap()
+    {
+        cout << "The converted units:" << endl
+             << endl;
+        for (auto &val : _myMap)
+        {
+            cout << "Origin unit: [" << val.first << "]" << endl;
+            for (auto &inner : _myMap[val.first])
+            {
+                cout << "              ";
+                cout << inner.second << " " << inner.first << endl;
+            }
+            cout << endl;
+        }
+    }
+
     //Addition and Subtraction operators:
-    NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &num2)
+    NumberWithUnits NumberWithUnits::operator+(const NumberWithUnits &num2) const
     {
         double convertedUnit = NumberWithUnits::convertUnits(num2._unit, this->_unit, num2._quantity);
         return NumberWithUnits(this->_quantity + convertedUnit, this->_unit);
@@ -70,16 +87,15 @@ namespace ariel
 
     NumberWithUnits &NumberWithUnits::operator+=(const NumberWithUnits &num2)
     {
-        this->_quantity += NumberWithUnits::convertUnits(num2._unit, this->_unit, num2._quantity);
-        return *this;
+        return *this = *this + num2;
     }
 
-    NumberWithUnits NumberWithUnits::operator+()
+    NumberWithUnits NumberWithUnits::operator+() const
     {
         return NumberWithUnits(this->_quantity, this->_unit);
     }
 
-    NumberWithUnits NumberWithUnits::operator-(const NumberWithUnits &num2)
+    NumberWithUnits NumberWithUnits::operator-(const NumberWithUnits &num2) const
     {
         double convertedUnit = NumberWithUnits::convertUnits(num2._unit, this->_unit, num2._quantity);
         return NumberWithUnits(this->_quantity - convertedUnit, this->_unit);
@@ -87,11 +103,10 @@ namespace ariel
 
     NumberWithUnits &NumberWithUnits::operator-=(const NumberWithUnits &num2)
     {
-        this->_quantity -= NumberWithUnits::convertUnits(num2._unit, this->_unit, num2._quantity);
-        return *this;
+        return *this = *this - num2;
     }
 
-    NumberWithUnits NumberWithUnits::operator-()
+    NumberWithUnits NumberWithUnits::operator-() const
     {
         return NumberWithUnits(-this->_quantity, this->_unit);
     }
@@ -124,7 +139,7 @@ namespace ariel
 
     bool NumberWithUnits::operator!=(NumberWithUnits const &num2) const
     {
-        return this->_quantity != NumberWithUnits::convertUnits(num2._unit, this->_unit, num2._quantity);
+        return !(*this == num2);
     }
 
     //Increment and Decrement operators:
@@ -156,9 +171,9 @@ namespace ariel
         return NumberWithUnits(num1 * num2._quantity, num2._unit);
     }
 
-    NumberWithUnits operator*(const NumberWithUnits &num1, const double num2)
+    NumberWithUnits NumberWithUnits::operator*(const double num2)
     {
-        return NumberWithUnits(num2 * num1._quantity, num1._unit);
+        return NumberWithUnits(num2 * this->_quantity, this->_unit);
     }
 
     //Input and Output operators:
@@ -177,8 +192,9 @@ namespace ariel
             }                       // example: you get -> [km]
             is >> ch;
         } while (ch != rightBracket);
-        if (!NumberWithUnits::_myMap.contains(unit)) // checks if the unit actually exists in the map
-        {                                            // example: if [km] actually exists
+
+        if (NumberWithUnits::_myMap.count(unit) == 0) // checks if the unit actually exists in the map
+        {                                             // example: if [km] actually exists
             throw invalid_argument{"This unit type doesn't exists!"};
         }
         num._unit = unit; // if the unit exists, it gets updated by type and quantity
