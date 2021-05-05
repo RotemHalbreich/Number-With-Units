@@ -23,12 +23,12 @@ namespace ariel
         static void printMap();
 
         //Addition and Subtraction operators:
-        NumberWithUnits operator+(const NumberWithUnits &num2) const;   //addition
-        NumberWithUnits &operator+=(const NumberWithUnits &num2); //addition assignment
-        NumberWithUnits operator+() const;                              //unary plus
-        NumberWithUnits operator-(const NumberWithUnits &num2) const;   //subtraction
-        NumberWithUnits &operator-=(const NumberWithUnits &num2); //subtraction assignment
-        NumberWithUnits operator-() const;                              //unary negation
+        NumberWithUnits operator+(const NumberWithUnits &num2) const; //addition
+        NumberWithUnits &operator+=(const NumberWithUnits &num2);     //addition assignment
+        NumberWithUnits operator+() const;                            //unary plus
+        NumberWithUnits operator-(const NumberWithUnits &num2) const; //subtraction
+        NumberWithUnits &operator-=(const NumberWithUnits &num2);     //subtraction assignment
+        NumberWithUnits operator-() const;                            //unary negation
 
         //Comparison operators:
         bool operator>(const NumberWithUnits &num2) const;  //greater than
@@ -46,7 +46,7 @@ namespace ariel
 
         //Multiplication operators:
         friend NumberWithUnits operator*(const double num1, const NumberWithUnits &num2); //multiplication
-        NumberWithUnits operator*(const double num2); //multiplication
+        NumberWithUnits operator*(const double num2);                                     //multiplication
 
         //Input and Output operators:
         friend std::istream &operator>>(std::istream &is, NumberWithUnits &num);       //input

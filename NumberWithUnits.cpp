@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-// #include <iomanip>
 #include "NumberWithUnits.hpp"
 
 using namespace std;
@@ -30,8 +29,8 @@ namespace ariel
         {
             units_file >> quantity_a >> unit_a >> eq >> quantity_b >> unit_b; // reads from file, example: units_file >> 1km = 100000cm
 
-            _myMap[unit_b][unit_a] = 1.0 / quantity_b; // [unit_b]: <cm, <km, 1/100,000>>  note: map[][]-> inner map's value
-            _myMap[unit_a][unit_b] = quantity_b;       // [unit_a]: <km, <cm, 100,000>>    note: map[]-> inner map
+            _myMap[unit_b][unit_a] = 1.0 / quantity_b;                        // [unit_b]: <cm, <km, 1/100,000>>  note: map[][]-> inner map's value
+            _myMap[unit_a][unit_b] = quantity_b;                              // [unit_a]: <km, <cm, 100,000>>    note: map[]-> inner map
 
             updateUnits(unit_a, unit_b);
             updateUnits(unit_b, unit_a);
@@ -62,6 +61,7 @@ namespace ariel
         return _myMap[origin][converted] * quantity;
     }
 
+    //Prints the units:
     void NumberWithUnits::printMap()
     {
         cout << "The converted units:" << endl
